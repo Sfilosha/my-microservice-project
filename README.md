@@ -1,11 +1,11 @@
-# Lesson 7
+# Lesson 8
 
 Це репозиторій для навчального проєкту в межах курсу "DevOps CI/CD".
 
-## Структура проєкту `lesson-7`
+## Структура проєкту `lesson-8`
 
 ```bash
-lesson-7/
+lesson-8/
 │
 ├── main.tf                  # Головний файл для підключення модулів
 ├── backend.tf               # Налаштування бекенду для стейтів (S3 + DynamoDB)
@@ -29,6 +29,14 @@ lesson-7/
 │   │   ├── ecr.tf           # Створення ECR репозиторію
 │   │   ├── variables.tf     # Змінні для ECR
 │   │   └── outputs.tf       # Виведення URL репозиторію ECR
+│   │
+│   └── jenkins/             # Модуль для Helm-установки Jenkins
+│       ├── jenkins.tf       # Helm release для Jenkins
+│       ├── variables.tf     # Змінні (ресурси, креденшели, values)
+│       ├── providers.tf     # Оголошення провайдерів
+│       ├── values.yaml      # Конфігурація jenkins
+│       └── outputs.tf       # Виводи (URL, пароль 
+│   │
 │   └── eks/                 # Модуль для EKS
 │       ├── eks.tf           # Створення EKS-кластера та воркерів
 │       ├── variables.tf     # Змінні для EKS

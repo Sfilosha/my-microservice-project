@@ -44,3 +44,19 @@ module "eks" {
   min_size        = 1                             # Мінімальна кількість нодів
 }
 
+module "jenkins" {
+  source       = "./modules/jenkins"
+  cluster_name = module.eks.eks_cluster_name
+
+  providers = {
+    helm = helm
+  }
+}
+
+module "argo_cd" {
+  source       = "./modules/argo-cd"
+  namespace    = "argocd"
+  chart_version = "5.46.4"
+}
+
+
