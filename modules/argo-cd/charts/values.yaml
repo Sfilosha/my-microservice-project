@@ -3,7 +3,7 @@ applications:
     namespace: default
     project: default
     source:
-      repoURL: <https://github.com/YOUR_USERNAME/example-repo.git>
+      repoURL: <https://github.com/Sfilosha/my-microservice-project/tree/lesson-8>
       path: django-chart
       targetRevision: main
       helm:
@@ -18,10 +18,13 @@ applications:
         selfHeal: true
 
 repositories:
-  - name: example-app
-    url: <https://github.com/YOUR_USERNAME/example-repo.git>
-    username: YOUR_USERNAME
-    password: YOUR_PASS
+repositories:
+  - name: app
+    url: <https://github.com/Sfilosha/my-microservice-project/tree/lesson-8>
+    type: git
+    secretRef:
+      name: repo-secret
+
 
 repoConfig:
   insecure: "true"

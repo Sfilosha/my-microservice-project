@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "example" {
-  ami           = "ami-0c55b159cbfafe1f0" # Amazon Linux 2
+  ami           = "ami-0c02fb55956c7d316" # Amazon Linux 2
   instance_type = "t2.micro"
 
   tags = {
@@ -12,9 +12,13 @@ resource "aws_instance" "example" {
 }
 
 # Підключаємо модуль для S3 та DynamoDB
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
 module "s3_backend" {
   source      = "./modules/s3-backend"           # Шлях до модуля
-  bucket_name = "terraform-state-bucket-001001"  # Ім'я S3-бакета
+  bucket_name = "terraform-state-bucket-${random_id.suffix.hex}"  # Ім'я S3-бакета
   table_name  = "terraform-locks"                # Ім'я DynamoDB
 }
 
@@ -31,7 +35,6 @@ module "vpc" {
 module "ecr" {
   source          = "./modules/ecr"   # Шлях до модуля
   repository_name = "lesson-5"        # Назва репозиторію
-  environment     = "dev"             # Середовище
 }
 
 module "eks" {
@@ -44,9 +47,36 @@ module "eks" {
   min_size        = 1                             # Мінімальна кількість нодів
 }
 
+terraform {
+  required_providers {
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.0"
+    }
+  }
+}
+
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
+  }
+}
+
 module "jenkins" {
-  source       = "./modules/jenkins"
-  cluster_name = module.eks.eks_cluster_name
+  source             = "./modules/jenkins"
+  cluster_name       = module.eks.eks_cluster_name
+  oidc_provider_arn  = module.eks.oidc_provider_arn
+  oidc_provider_url  = module.eks.oidc_provider_url
 
   providers = {
     helm = helm

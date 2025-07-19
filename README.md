@@ -31,10 +31,6 @@ lesson-8/
 │   │   └── outputs.tf       # Виведення URL репозиторію ECR
 │   │
 │   ├── jenkins/             # Модуль для Helm-установки Jenkins
-│   │   ├── templates/
-│   │   │   ├── rbac.yaml
-│   │   │   ├── serviceaccount.yaml
-│   │   │
 │   │   ├── jenkins.tf       # Helm release для Jenkins
 │   │   ├── variables.tf     # Змінні (ресурси, креденшели, values)
 │   │   ├── providers.tf     # Оголошення провайдерів
@@ -57,18 +53,18 @@ lesson-8/
 │ 	 	    ├── Chart.yaml
 │	  	    ├── values.yaml          # Список applications, repositories
 │			    └── templates/
-│		        ├── application.yaml
-│		        └── repository.yaml
+│		        ├── application.yaml # Шаблон Kubernetes manifest для Argo CD Application: описує Git репозиторій
+│		        └── repository.yaml # Шаблон Kubernetes manifest для Argo CD Application: описує, які додатки (charts/папки) і як синхронізувати
 │
 ├── charts/
 │   └── django-app/
 │       ├── templates/
-│       │   ├── deployment.yaml
-│       │   ├── service.yaml
-│       │   ├── configmap.yaml
-│       │   └── hpa.yaml
-│       ├── Chart.yaml
-│       └── values.yaml     # ConfigMap зі змінними середовища
+│       │   ├── deployment.yaml # Kubernetes Deployment
+│       │   ├── service.yaml # Kubernetes Service
+│       │   ├── configmap.yaml # ConfigMap для середовища
+│       │   └── hpa.yaml # Horizontal Pod Autoscaler
+│       ├── Chart.yaml # Основний файл чарта
+│       └── values.yaml # Значення за замовчуванням для чарта
 │
 └── README.md                # Документація проєкту
 ```

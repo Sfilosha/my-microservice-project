@@ -1,7 +1,7 @@
  controller:
   admin:
     username: admin
-    password: password123
+    password: admin123
 
   serviceType: LoadBalancer
   servicePort: 80
@@ -33,23 +33,19 @@
     - docker-workflow:latest
     - job-dsl:latest
 
-  serviceAccount:
-     name: jenkins-sa
-     create: false
-
   JCasC:
     configScripts:
       credentials: |
         credentials:
-        system:
-          domainCredentials:
-            - credentials:
-                - usernamePassword:
-                    scope: GLOBAL
-                    id: github-token
-                    username: "${GITHUB_USERNAME}"
-                    password: "${GITHUB_TOKEN}"
-                    description: GitHub PAT
+          system:
+            domainCredentials:
+              - credentials:
+                  - usernamePassword:
+                      scope: GLOBAL
+                      id: github-token
+                      username: AndriyDmitriv
+                      password: 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
+                      description: GitHub PAT
       seed-job: |
         jobs:
           - script: >
@@ -86,3 +82,17 @@
                   }
                 }
               }
+
+ serviceAccount:
+     name: jenkins-sa
+     create: false
+
+ agent:
+  kubernetes:
+    namespace: jenkins
+    podTemplates:
+      - name: kaniko
+        containers:
+          - name: kaniko
+            image: gcr.io/kaniko-project/executor:latest
+            args: ["--dockerfile=/workspace/Dockerfile", "--context=dir:///workspace/", "--destination=..."]

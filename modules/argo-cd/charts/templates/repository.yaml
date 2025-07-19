@@ -1,0 +1,7 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Repository
+metadata:
+  name: my-microservice-project-repo
+spec:
+  type: git
+  url: https://github.com/Sfilosha/my-microservice-project.git
