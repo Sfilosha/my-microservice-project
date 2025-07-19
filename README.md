@@ -252,3 +252,84 @@ kubectl -n argocd port-forward svc/argo-cd-server 8080:443
    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
    ```
 4. Перевірте статус Application в UI.
+
+# Terraform RDS Module
+
+## Опис
+
+Універсальний модуль для створення AWS RDS бази даних або Aurora кластера на основі параметра `use_aurora`. Модуль автоматично створює DB Subnet Group, Security Group та Parameter Group.
+
+---
+
+## Приклад використання
+
+```hcl
+module "rds" {
+  source              = "./modules/rds"
+  name                = "mydb"
+  use_aurora          = true
+  engine              = "aurora-postgresql"
+  engine_version      = "15.3"
+  engine_version_cluster = "15.3"
+  parameter_group_family_aurora = "aurora-postgresql15"
+  parameter_group_family_rds = "postgres15"
+  instance_class      = "db.t3.micro"
+  allocated_storage   = 20
+  db_name             = "appdb"
+  username            = "admin"
+  password            = "supersecret"
+  vpc_id              = "vpc-123456"
+  subnet_private_ids  = ["subnet-aaa", "subnet-bbb"]
+  subnet_public_ids   = ["subnet-ccc", "subnet-ddd"]
+  publicly_accessible = false
+  multi_az            = false
+  backup_retention_period = "7"
+  parameters          = {
+    max_connections = "100"
+    work_mem        = "4MB"
+    log_statement   = "all"
+  }
+  tags = {
+    Environment = "dev"
+    Project     = "example"
+  }
+}
+```
+
+## Змінні модуля RDS
+
+| Назва                         | Тип             | Опис                                                         | Значення за замовчуванням      |
+|-------------------------------|-----------------|--------------------------------------------------------------|-------------------------------|
+| `name`                        | string          | Назва інстансу або кластера                                   | —                             |
+| `use_aurora`                  | bool            | Використовувати Aurora Cluster (`true`) чи стандартний RDS (`false`) | `false`                       |
+| `engine`                      | string          | Тип двигуна для стандартної RDS                              | `postgres`                    |
+| `engine_version`              | string          | Версія двигуна для стандартної RDS                           | `14.7`                        |
+| `engine_version_cluster`      | string          | Версія двигуна для Aurora кластера                           | `15.3`                        |
+| `parameter_group_family_aurora` | string        | Родина параметрів для Aurora                                 | `aurora-postgresql15`         |
+| `parameter_group_family_rds`  | string          | Родина параметрів для стандартної RDS                        | `postgres15`                  |
+| `instance_class`              | string          | Клас інстансу (тип машини)                                   | `db.t3.micro`                 |
+| `allocated_storage`           | number          | Розмір диску (для стандартної RDS)                           | `20`                         |
+| `db_name`                    | string          | Назва бази даних                                              | —                             |
+| `username`                   | string          | Ім’я користувача БД                                          | —                             |
+| `password`                   | string (sensitive) | Пароль користувача БД                                       | —                             |
+| `vpc_id`                    | string          | ID VPC                                                       | —                             |
+| `subnet_private_ids`         | list(string)    | Список приватних subnet ID                                   | —                             |
+| `subnet_public_ids`          | list(string)    | Список публічних subnet ID                                   | —                             |
+| `publicly_accessible`         | bool            | Чи доступний інстанс з публічної мережі                      | `false`                      |
+| `multi_az`                   | bool            | Використовувати multi-AZ (для RDS)                          | `false`                      |
+| `parameters`                 | map(string)     | Ключ-значення параметрів для DB Parameter Group             | `{}`                         |
+| `backup_retention_period`    | string          | Період зберігання бекапів (дні)                             | `""` (без бекапів)            |
+| `tags`                      | map(string)     | Теги для ресурсів                                           | `{}`                         |
+| `aurora_replica_count`       | number          | Кількість реплік Aurora кластера                             | `1`                          |
+| `aurora_instance_count`      | number          | Загальна кількість інстансів Aurora (primary + replica)      | `2`                          |
+
+
+## Як змінити тип БД, engine, клас інстансу тощо
+
+- Щоб створити **Aurora кластер**, встановіть `use_aurora = true` та вкажіть `engine` і `engine_version_cluster` відповідно, наприклад `"aurora-postgresql"`.
+
+- Для звичайного **RDS інстансу** встановіть `use_aurora = false` і задайте `engine` (наприклад, `"postgres"`) та `engine_version`.
+
+- Щоб змінити тип інстансу, змініть значення `instance_class` (наприклад, `db.t3.small`).
+
+- Параметри підмереж (`subnet_private_ids`, `subnet_public_ids`), доступність (`publicly_accessible`), multi-AZ та інші налаштування можна регулювати через відповідні змінні.
