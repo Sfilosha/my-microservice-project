@@ -26,9 +26,14 @@ lesson-5/
 │   │   └── outputs.tf       # Виведення інформації про VPC
 │   │
 │   └── ecr/                 # Модуль для ECR
-│       ├── ecr.tf           # Створення ECR репозиторію
-│       ├── variables.tf     # Змінні для ECR
-│       └── outputs.tf       # Виведення URL репозиторію ECR
+│   │   ├── ecr.tf           # Створення ECR репозиторію
+│   │   ├── variables.tf     # Змінні для ECR
+│   │   └── outputs.tf       # Виведення URL репозиторію ECR
+│   └── eks/                 # Модуль для EKS
+│       ├── eks.tf           # Створення EKS-кластера та воркерів
+│       ├── variables.tf     # Змінні для EKS
+│       ├── outputs.tf       # Виведення інформації про EKS
+│       └── node.tf          # IAM-ролі для EKS
 │
 └── README.md                # Документація проєкту
 ```
