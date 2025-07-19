@@ -43,6 +43,13 @@ lesson-8/
 │   │   ├── outputs.tf       # Виведення інформації про EKS
 │   │   └── node.tf          # IAM-ролі для EKS
 │   │ 
+│   ├── rds/                 # Модуль для RDS
+│   │   ├── rds.tf           # Створення RDS бази даних  
+│   │   ├── aurora.tf        # Створення aurora кластера бази даних  
+│   │   ├── shared.tf        # Спільні ресурси  
+│   │   ├── variables.tf     # Змінні (ресурси, креденшели, values)
+│   │   └── outputs.tf  
+
 │   └── argo_cd/             # Модуль для Helm-установки Argo CD
 │       ├── argo_cd.tf       # Helm release для Argo CD
 │       ├── variables.tf     # Змінні (версія чарта, namespace, repo URL тощо)
