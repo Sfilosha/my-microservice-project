@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-west-2"
+  region = "eu-north-1"
 }
 
 resource "aws_instance" "example" {
@@ -39,7 +39,7 @@ module "ecr" {
 
 module "eks" {
   source          = "./modules/eks"          
-  cluster_name    = "eks-cluster-demo"            # Назва кластера
+  cluster_name    = "funny-dubstep-party"   # Назва кластера
   subnet_ids      = module.vpc.public_subnets     # ID підмереж
   instance_type   = "t2.micro"                    # Тип інстансів
   desired_size    = 1                             # Бажана кількість нодів
@@ -57,11 +57,11 @@ terraform {
 }
 
 data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
+  name = module.eks.eks_cluster_name
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
+  name = module.eks.eks_cluster_name
 }
 
 provider "helm" {

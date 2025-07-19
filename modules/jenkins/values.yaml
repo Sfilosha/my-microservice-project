@@ -3,7 +3,7 @@
     username: admin
     password: admin123
 
-  serviceType: LoadBalancer
+  serviceType: kubectl get all -n jenkins
   servicePort: 80
   service:
     port: 80
@@ -19,7 +19,7 @@
 
   persistentVolume:
     enabled: true
-    storageClass: "ebs-sc"
+    storageClass: "gp2"
     size: 10Gi
 
   installPlugins:
