@@ -74,7 +74,11 @@ lesson-8/
 1. terraform init – Ініціалізація запуску
 2. terraform plan – Планування змін
 3. terraform apply – Застосування змін
-4. terraform destroy – Знищення інфраструктури
+4. Після успішного застосування, збережіть kubeconfig (якщо він генерується в модулі EKS) і встановіть контекст:
+```bash 
+aws eks update-kubeconfig --name eks-cluster-demo --region us-west-2
+```
+5. terraform destroy – Знищення інфраструктури
 
 ## Опис модулів
 
@@ -213,3 +217,31 @@ kubectl create secret generic github-credentials \
 ```bash 
 helm upgrade --install jenkins . -n jenkins -f values.yaml 
 ```
+
+# Як перевірити Jenkins job
+
+1. Зробіть порт-форвард:
+```bash 
+kubectl -n jenkins port-forward svc/jenkins 8080:8080
+```
+
+2. Відкрийте в браузері: http://localhost:8080
+3. Отримайте пароль:
+```bash 
+kubectl -n jenkins get secret jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode
+```
+4. Запустіть pipeline та перегляньте логи.
+
+# Як побачити результат в Argo CD
+
+1. Порт-форвард:
+```bash
+kubectl -n argocd port-forward svc/argo-cd-server 8080:443
+```
+2. Відкрийте в браузері: http://localhost:8080
+3. Логін: admin
+   Пароль: 
+   ```bash
+   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
+   ```
+4. Перевірте статус Application в UI.
