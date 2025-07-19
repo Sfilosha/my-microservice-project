@@ -24,3 +24,17 @@ config:
   POSTGRES_DB: django_db
   POSTGRES_PASSWORD: pass9764gd
 
+controller:
+  env:
+    - name: GITHUB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: github-credentials
+          key: username
+    - name: GITHUB_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: github-credentials
+          key: token
+
+

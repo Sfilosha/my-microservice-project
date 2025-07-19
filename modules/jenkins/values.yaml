@@ -41,15 +41,15 @@
     configScripts:
       credentials: |
         credentials:
-          system:
-            domainCredentials:
-              - credentials:
-                  - usernamePassword:
-                      scope: GLOBAL
-                      id: github-token
-                      username: AndriyDmitriv
-                      password: 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
-                      description: GitHub PAT
+        system:
+          domainCredentials:
+            - credentials:
+                - usernamePassword:
+                    scope: GLOBAL
+                    id: github-token
+                    username: "${GITHUB_USERNAME}"
+                    password: "${GITHUB_TOKEN}"
+                    description: GitHub PAT
       seed-job: |
         jobs:
           - script: >

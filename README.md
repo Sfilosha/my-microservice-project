@@ -25,23 +25,40 @@ lesson-8/
 │   │   ├── variables.tf     # Змінні для VPC
 │   │   └── outputs.tf       # Виведення інформації про VPC
 │   │
-│   └── ecr/                 # Модуль для ECR
+│   ├── ecr/                 # Модуль для ECR
 │   │   ├── ecr.tf           # Створення ECR репозиторію
 │   │   ├── variables.tf     # Змінні для ECR
 │   │   └── outputs.tf       # Виведення URL репозиторію ECR
 │   │
-│   └── jenkins/             # Модуль для Helm-установки Jenkins
-│       ├── jenkins.tf       # Helm release для Jenkins
-│       ├── variables.tf     # Змінні (ресурси, креденшели, values)
-│       ├── providers.tf     # Оголошення провайдерів
-│       ├── values.yaml      # Конфігурація jenkins
-│       └── outputs.tf       # Виводи (URL, пароль 
+│   ├── jenkins/             # Модуль для Helm-установки Jenkins
+│   │   ├── templates/
+│   │   │   ├── rbac.yaml
+│   │   │   ├── serviceaccount.yaml
+│   │   │
+│   │   ├── jenkins.tf       # Helm release для Jenkins
+│   │   ├── variables.tf     # Змінні (ресурси, креденшели, values)
+│   │   ├── providers.tf     # Оголошення провайдерів
+│   │   ├── values.yaml      # Конфігурація jenkins
+│   │   └── outputs.tf       # Виводи (URL, пароль 
 │   │
 │   └── eks/                 # Модуль для EKS
-│       ├── eks.tf           # Створення EKS-кластера та воркерів
-│       ├── variables.tf     # Змінні для EKS
-│       ├── outputs.tf       # Виведення інформації про EKS
-│       └── node.tf          # IAM-ролі для EKS
+│   │   ├── eks.tf           # Створення EKS-кластера та воркерів
+│   │   ├── variables.tf     # Змінні для EKS
+│   │   ├── outputs.tf       # Виведення інформації про EKS
+│   │   └── node.tf          # IAM-ролі для EKS
+│   │ 
+│   └── argo_cd/             # Модуль для Helm-установки Argo CD
+│       ├── argo_cd.tf       # Helm release для Argo CD
+│       ├── variables.tf     # Змінні (версія чарта, namespace, repo URL тощо)
+│       ├── providers.tf     # Kubernetes+Helm.  переносимо з модуля jenkins
+│       ├── values.yaml      # Кастомна конфігурація Argo CD
+│       ├── outputs.tf       # Виводи (hostname, initial admin password)
+│		    └──charts/                  # Helm-чарт для створення app'ів
+│ 	 	    ├── Chart.yaml
+│	  	    ├── values.yaml          # Список applications, repositories
+│			    └── templates/
+│		        ├── application.yaml
+│		        └── repository.yaml
 │
 ├── charts/
 │   └── django-app/
@@ -113,6 +130,18 @@ lesson-8/
 - HPA — автоматичне масштабування при >70% CPU.
 - values.yaml — параметри конфігурації чарту (образ, порти, autoscaling, тощо).
 
+# Jenkins Service Account + RBAC
+
+Перед запуском Jenkins застосовуються:
+
+- `serviceaccount.yaml` — створює Jenkins SA
+- `rbac.yaml` — дає повні права на ресурси в кластері
+
+Ці файли розташовані в:  
+`modules/jenkins/templates/`
+
+Не потрібно застосовувати вручну — вони створюються Helm-чартом автоматично при `terraform apply`.
+
 # Передумови
 
 1. Наявність AWS облікового запису
@@ -143,7 +172,7 @@ docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
 # Підключення до EKS-кластера
 Після створення кластера за допомогою Terraform, виконайте:
 
-```
+```bash
 aws eks update-kubeconfig --region <your-region> --name <cluster-name>
 kubectl get nodes
 ```
@@ -154,10 +183,37 @@ kubectl get nodes
 
 Після оновлення values.yaml із правильним image.repository, виконайте:
 
-```
+```bash
 cd charts/django-app
 
 helm install django-app .      # або helm upgrade --install django-app .
 kubectl get svc                # Перевірка IP-адреси
 kubectl get hpa                # Перевірка автоскейлінгу
+```
+
+# GitHub Credentials для Jenkins (через JCasC)
+Для підключення Jenkins до GitHub через Jenkins Configuration as Code, використовуються GitHub username та Personal Access Token (PAT), які підтягуються з Kubernetes secret у вигляді змінних середовища.
+
+## Створити Kubernetes Secret
+Перед розгортанням Jenkins створіть секрет github-credentials, що містить ваш GitHub username та token:
+
+❗ Не додавайте `username/password` у values.yaml напряму.  
+Використовуйте секрет `github-credentials`:
+
+```bash
+kubectl create secret generic github-credentials \
+  --from-literal=username=<your-github-username> \
+  --from-literal=token=<your-pat-token> \
+  -n jenkins
+```
+
+## Деплой Jenkins через Terraform або Helm
+Якщо Jenkins встановлюється через Terraform (з Helm), просто виконайте:
+```bash
+ terraform apply 
+ ```
+
+Або, якщо вручну через Helm:
+```bash 
+helm upgrade --install jenkins . -n jenkins -f values.yaml 
 ```
