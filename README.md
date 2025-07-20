@@ -1,11 +1,11 @@
-# Lesson 8
+# Final Project
 
 Це репозиторій для навчального проєкту в межах курсу "DevOps CI/CD".
 
-## Структура проєкту `lesson-8`
+## Структура проєкту `final-project`
 
 ```bash
-lesson-8/
+final-project/
 │
 ├── main.tf                  # Головний файл для підключення модулів
 ├── backend.tf               # Налаштування бекенду для стейтів (S3 + DynamoDB)
@@ -70,8 +70,13 @@ lesson-8/
 │       │   ├── service.yaml # Kubernetes Service
 │       │   ├── configmap.yaml # ConfigMap для середовища
 │       │   └── hpa.yaml # Horizontal Pod Autoscaler
-│       ├── Chart.yaml # Основний файл чарта
+│       │ Chart.yaml # Основний файл чарта
 │       └── values.yaml # Значення за замовчуванням для чарта
+└──docker/
+│   └── django/
+│   │   ├── Dockerfile
+│   │   └── Jenkinsfile
+│   └── docker-compose.yaml
 │
 └── README.md                # Документація проєкту
 ```

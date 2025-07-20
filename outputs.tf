@@ -16,5 +16,3 @@ output "jenkins_namespace" {
 }
 
 
-
-

@@ -19,7 +19,7 @@
 
   persistentVolume:
     enabled: true
-    storageClass: "gp2"
+    storageClass: ""
     size: 10Gi
 
   installPlugins:

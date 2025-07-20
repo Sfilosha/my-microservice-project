@@ -5,5 +5,3 @@ output "jenkins_release_name" {
 output "jenkins_namespace" {
   value = helm_release.jenkins.namespace
 }
-
-

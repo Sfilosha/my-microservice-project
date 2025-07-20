@@ -38,3 +38,13 @@ variable "min_size" {
   default     = 1
 }
 
+variable "kubernetes_version" {
+  description = "Версія Kubernetes для EKS кластера"
+  type        = string
+  default     = "1.29"  # або остання підтримувана версія
+}
+
+
+
+
+
